@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<document>
+  test <b>This should be bold!</b>
+  <math>\nabla\times\mathbf{H}=0</math>
+  <section name="Section">
+    Text in a section.
+    <plot>
+      set xlabel "$\\nabla$"
+      plot sin(x) t "Sine Wave"
+    </plot>
+  </section>
+</document>
