@@ -10,7 +10,7 @@ BUILD INSTRUCTIONS
 checkout development branch
 
 
-type-in:L make (and keep your fingers crossed)
+type-in: make (and keep your fingers crossed)
 
 USAGE
 =====
