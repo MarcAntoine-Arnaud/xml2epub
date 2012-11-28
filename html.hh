@@ -23,7 +23,7 @@ namespace xml2epub {
     void put_text( const std::string & str );  
     output_state * bold();
     output_state * math();
-    output_state * section( const std::string & section_name );
+    output_state * section( const std::string & section_name, unsigned int level );
     output_state * plot();
     void finish();
   };

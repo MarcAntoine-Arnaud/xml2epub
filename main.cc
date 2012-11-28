@@ -88,12 +88,20 @@ namespace xml2epub {
 	  out = state.math();
 	} else if ( name == "plot" ) {
 	  out = state.plot();
-	} else if ( name == "section" ) {
+	} else if ( ( name == "section" ) || ( name == "subsection" ) || ( name == "subsubsection" ) ) {
 	  string section_name = element.get_attribute_value( "name" );
 	  if ( section_name.length() == 0 ) {
 	    throw runtime_error( "Sections must have a name attribute" );
 	  }
-	  out = state.section( section_name );
+	  unsigned int level;
+	  if ( name == "subsection" ) {
+	    level = 1;
+	  } else if ( name == "subsubsection" ) {
+	    level = 2;
+	  } else {
+	    level = 0;
+	  }
+	  out = state.section( section_name, level );
 	} else {
 	  stringstream ss;
 	  ss << "Unknown element with name \"" << name << "\" found!" << endl;

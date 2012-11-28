@@ -36,7 +36,7 @@ namespace xml2epub {
       throw runtime_error( "can't use math xml tag in latex math" );
     }
 
-    output_state * section( const std::string & section_name ) {
+    output_state * section( const std::string & section_name, unsigned int level ) {
       throw runtime_error( "can't use section xml tag in latex math" );
     }
 
@@ -69,7 +69,7 @@ class latex_plot_state : public latex_state {
       throw runtime_error( "can't use math xml tag in plot" );
     }
 
-    output_state * section( const std::string & section_name ) {
+    output_state * section( const std::string & section_name, unsigned int level ) {
       throw runtime_error( "can't use section xml tag in plot" );
     }
 
@@ -135,8 +135,15 @@ class latex_plot_state : public latex_state {
     m_out << str;
   }
 
-  output_state * latex_state::section( const std::string & section_name ) {
-    m_out << "\\section{" << section_name << "}" << endl;
+  output_state * latex_state::section( const std::string & section_name, unsigned int level ) {
+    if ( level > 2 ) {
+      throw runtime_error( "latex backend only supports subsubsection (level=2)" );
+    }
+    m_out << "\\";
+    for ( unsigned int i=0; i<level; ++i ) {
+      m_out << "sub";
+    }
+    m_out << "section{" << section_name << "}" << endl;
     latex_state * retval = new latex_state( m_root, *this, m_out );
     m_children.push_back( retval );
     return retval;

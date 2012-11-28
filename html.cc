@@ -49,7 +49,7 @@ namespace xml2epub {
       throw runtime_error( "can't use math xml tag in latex math" );
     }
 
-    output_state * section( const std::string & section_name ) {
+    output_state * section( const std::string & section_name, unsigned int level ) {
       throw runtime_error( "can't use section xml tag in latex math" );
     }
 
@@ -143,7 +143,7 @@ namespace xml2epub {
       throw runtime_error( "can't use math xml tag in plot" );
     }
 
-    output_state * section( const std::string & section_name ) {
+    output_state * section( const std::string & section_name, unsigned int level ) {
       throw runtime_error( "can't use section xml tag in plot" );
     }
 
@@ -211,8 +211,14 @@ namespace xml2epub {
     m_xml_node.add_child_text( str );
   }
 
-  output_state * html_state::section( const std::string & section_name ) {
-    Element * header_node = m_xml_node.add_child( "h1" );
+  output_state * html_state::section( const std::string & section_name, unsigned int level ) {
+    string html_section_element_name;
+    {
+      stringstream ss;
+      ss << "h" << ( level + 1 );
+      html_section_element_name = ss.str();
+    }
+    Element * header_node = m_xml_node.add_child( html_section_element_name );
     if ( header_node == NULL ) {
       throw runtime_error( "add_child() failed" );
     }
