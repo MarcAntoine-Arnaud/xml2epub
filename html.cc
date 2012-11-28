@@ -170,7 +170,8 @@ namespace xml2epub {
 	}
 	parse_plot( m_data.str(), png_file );
       }
-      Element * new_node = m_xml_node.add_child( "img" );
+      Element * paragraph = m_xml_node.add_child( "p" );
+      Element * new_node = paragraph->add_child( "img" );
       new_node->set_attribute( string("src"), image_file_path );
     }
   };
