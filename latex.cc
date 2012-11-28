@@ -190,6 +190,7 @@ class latex_plot_state : public latex_state {
 	m_out << "\\documentclass{minimal}" << endl;
 	m_out << "\\usepackage{fontspec}" << endl;
 	m_out << "\\usepackage{unicode-math}" << endl;
+	m_out << "\\setmathfont{STIXGeneral}" << endl;
 	m_out << "\\begin{document}" << endl;
       } else {
 	m_out << "\\documentclass[a4paper,12pt]{article}" << endl;
@@ -197,6 +198,7 @@ class latex_plot_state : public latex_state {
 	m_out << "\\usepackage{unicode-math}" << endl;
 	m_out << "\\usepackage{graphicx}" << endl;
 	m_out << "\\usepackage{fullpage}" << endl;
+	m_out << "\\setmathfont{STIXGeneral}" << endl;
 	m_out << "\\begin{document}" << endl;
       }
     }
