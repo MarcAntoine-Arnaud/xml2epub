@@ -52,6 +52,7 @@ namespace xml2epub {
 
     void finish() {
       m_ss << "$";
+      system( "mkdir -p images" );
       string file_name;
       {
 	stringstream ss;	
