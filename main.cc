@@ -8,6 +8,7 @@
 #include <libxml++/libxml++.h>
 #include <tidy.h>
 #include <buffio.h>
+#include <glib-object.h>
 
 #include "builder.hh"
 #include "html.hh"
@@ -165,6 +166,8 @@ int main( int argc, char * argv[] ) {
   string output_file_path;
   bool output_file_is_cout;
   bool output_html;
+
+  g_type_init();
 
   xml2epub::parse_cmdline_args( argc, argv, keep_text, input_file_path, input_file_is_cin,
 				output_file_path, output_file_is_cout, output_html );

@@ -85,16 +85,16 @@ class latex_plot_state : public latex_state {
       string image_file_path;
       {
 	stringstream ss;
-	ss << "images/" << getpid() << "_" << random() << ".png";
+	ss << "images/" << getpid() << "_" << random() << ".pdf";
 	image_file_path = ss.str();
       }
       system( "mkdir -p images" );
       {
-	ofstream png_file( image_file_path.c_str() );
-	if ( !png_file ) {
+	ofstream pdf_file( image_file_path.c_str() );
+	if ( !pdf_file ) {
 	  throw runtime_error( "Unable to create image file" );
 	}
-	parse_plot( m_data.str(), png_file );
+	parse_plot( m_data.str(), pdf_file, false );
       }
       m_out << "\\begin{figure}" << endl;
       m_out << "\\centering" << endl;

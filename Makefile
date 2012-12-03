@@ -1,13 +1,15 @@
 CXX=g++
 XML_CFLAGS=$(shell PKG_CONFIG_PATH=/home/fr810/Documents/LocalLinux/share/pkgconfig:/home/fr810/Documents/LocalLinux/lib/pkgconfig pkg-config libxml++-2.6 --cflags)
-CFLAGS=-O0 -g -isystem=/home/fr810/Documents/LocalLinux/include $(XML_CFLAGS) -I/home/fr810/Documents/LocalLinux/include/tidy
+POPPLER_CFLAGS=$(shell PKG_CONFIG_PATH=/home/fr810/Documents/LocalLinux/share/pkgconfig:/home/fr810/Documents/LocalLinux/lib/pkgconfig pkg-config poppler-glib --cflags)
+CFLAGS=-O0 -g -isystem=/home/fr810/Documents/LocalLinux/include $(XML_CFLAGS) $(POPPLER_CFLAGS) -I/home/fr810/Documents/LocalLinux/include/tidy
 XML_LDFLAGS=$(shell PKG_CONFIG_PATH=/home/fr810/Documents/LocalLinux/share/pkgconfig:/home/fr810/Documents/LocalLinux/lib/pkgconfig pkg-config libxml++-2.6 --libs)
-LDFLAGS=-L/home/fr810/Documents/LocalLinux/lib -lboost_program_options $(XML_LDFLAGS) -ltidy
+POPPLER_LDFLAGS=$(shell PKG_CONFIG_PATH=/home/fr810/Documents/LocalLinux/share/pkgconfig:/home/fr810/Documents/LocalLinux/lib/pkgconfig pkg-config poppler-glib --libs)
+LDFLAGS=-L/home/fr810/Documents/LocalLinux/lib -lboost_program_options $(XML_LDFLAGS) $(POPPLER_LDFLAGS) -ltidy -Wl,-rpath,/home/fr810/Documents/LocalLinux/lib
 CXXFLAGS=
 
 TARGET=xml2epub
 
-SRC=main.cc html.cc latex.cc plot.cc
+SRC=main.cc html.cc latex.cc plot.cc latex2util.cc
 OBJ=$(SRC:.cc=.o)
 DEP=$(SRC:.cc=.d)
 

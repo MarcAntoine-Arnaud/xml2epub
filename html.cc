@@ -11,6 +11,7 @@
 #include "html.hh"
 #include "latex.hh"
 #include "plot.hh"
+#include "latex2util.hh"
 
 using namespace xmlpp;
 using namespace std;
@@ -20,25 +21,13 @@ namespace xml2epub {
   class html_math_state : public html_state {
   private:
     stringstream m_ss;
-    latex_builder m_latex;
-    output_state * m_root_state;
-    output_state * m_math_state;
   public:
     html_math_state( html_builder & root, html_state & parent, xmlpp::Element & xml_node ) 
-      : html_state( root, parent, xml_node ), m_latex( m_ss, true ), m_root_state( NULL ), m_math_state( NULL ) {
-      m_root_state = m_latex.create_root();
-      m_math_state = m_root_state->math();
+      : html_state( root, parent, xml_node ){
+      m_ss << "$";
     }
 
     virtual ~html_math_state() {
-      if ( m_math_state != NULL ) {
-	delete m_math_state;
-	m_math_state = NULL;
-      }
-      if ( m_root_state != NULL ) {
-	delete m_root_state;
-	m_root_state = NULL;
-      }
     }
 
     output_state * bold() {
@@ -58,68 +47,33 @@ namespace xml2epub {
     }
 
     void put_text( const string & str ) {
-      m_math_state->put_text( str );
+      m_ss << str;
     }
 
     void finish() {
-      m_math_state->finish();
-      m_root_state->finish();
+      m_ss << "$";
       string file_name;
       {
-	stringstream ss;
-
+	stringstream ss;	
 	ss << getpid() << "_" << random();
 	file_name = ss.str();
       }
-      string tex_file("/tmp/");
-      tex_file += file_name;
-      tex_file += ".tex";
-      ofstream file;
-      file.open( tex_file.c_str(), ios_base::trunc | ios_base::out );
-      if ( !file ) {
-	throw runtime_error( "Unable to open tmp file" );
-      }
-      file << m_ss.str();
-      file.close();
-
-      string command;
-      {
-	stringstream ss;
-	ss << "(( cd /tmp; xelatex " << file_name << ".tex; pdf2ps " << file_name << ".pdf; ps2eps " << file_name << ".ps; rm -f " << file_name << ".pdf; gs -dEPSCrop -sDEVICE=pngalpha -sOutputFile=" << file_name << ".png " << file_name << ".eps; cd -; mkdir -p images; cp /tmp/" << file_name << ".png images/; rm -f /tmp/" << file_name << ".*; ) 2>&1 ) > /dev/null";
-	command = ss.str();
-      }
-      system( command.c_str() );
-#if 0      
-      string svgname;
-      {
-	stringstream ss;
-	ss << "/tmp/" << file_name << ".svg";
-	svgname = ss.str();
-      }
-      {
-	ifstream svg( svgname.c_str() );
-	if ( !svg ) {
-	  throw runtime_error( "Unable to open svg file" );
-	}
-	DomParser parser;
-	parser.set_substitute_entities( true );
-	parser.parse_stream( svg );
-	if ( !parser ) {
-	  throw runtime_error( "Unable to parse svg" );
-	}
-	const Element * rootNode = parser.get_document()->get_root_node();
-	m_xml_node.import_node( rootNode );
-      }
-#else
       Element * new_node = m_xml_node.add_child( "img" );
       string img_url;
       {
 	stringstream ss;
-	ss << "images/" << file_name << ".png";
+	ss << "images/" << file_name << ".svg";
 	img_url = ss.str();
       }
+      {
+	ofstream svg_file( img_url.c_str() );
+	{
+	  string data( m_ss.str() );
+	  stringstream iss( data );
+	  latex2svg( iss, svg_file );
+	}
+      }
       new_node->set_attribute( string("src"), img_url );
-#endif
     }
 
   };
@@ -159,16 +113,16 @@ namespace xml2epub {
       string image_file_path;
       {
 	stringstream ss;
-	ss << "images/" << getpid() << "_" << random() << ".png";
+	ss << "images/" << getpid() << "_" << random() << ".svg";
 	image_file_path = ss.str();
       }
       system( "mkdir -p images" );
       {
-	ofstream png_file( image_file_path.c_str() );
-	if ( !png_file ) {
+	ofstream svg_file( image_file_path.c_str() );
+	if ( !svg_file ) {
 	  throw runtime_error( "Unable to create image file" );
 	}
-	parse_plot( m_data.str(), png_file );
+	parse_plot( m_data.str(), svg_file, true );
       }
       Element * paragraph = m_xml_node.add_child( "p" );
       Element * new_node = paragraph->add_child( "img" );

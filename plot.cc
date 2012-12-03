@@ -3,11 +3,12 @@
 #include <fstream>
 #include <cstdlib>
 #include "plot.hh"
+#include "latex2util.hh"
 
 using namespace std;
 
 namespace xml2epub {
-  void parse_plot( const string & data, ostream & out ) {
+  void parse_plot( const string & data, ostream & out, bool out_svg ) {
     string file_name;
     {
       stringstream ss;
@@ -34,19 +35,23 @@ namespace xml2epub {
     string shell_command;
     {
       stringstream ss;
-      ss << "( ( cd /tmp; gnuplot " << file_name << ".plt; xelatex " << file_name << ".tex; gs -sDEVICE=pngalpha -sOutputFile=" << file_name << ".png " << file_name << ".pdf; cd -; ) 2>&1 ) > /dev/null";
+      ss << "( ( cd /tmp; gnuplot " << file_name << ".plt; xelatex " << file_name << ".tex; cd -; ) 2>&1 ) > /dev/null";
       shell_command = ss.str();
     }
     system( shell_command.c_str() );
     {
-      string png_file;
+      string pdf_file;
       {
 	stringstream ss;
-	ss << "/tmp/" << file_name << ".png";
-	png_file = ss.str();
+	ss << "/tmp/" << file_name << ".pdf";
+	pdf_file = ss.str();
       }
-      ifstream png( png_file.c_str() );
-      out << png.rdbuf();
+      if ( out_svg == true ) {
+	pdf2svg( pdf_file, out );
+      } else {
+	ifstream pdf( pdf_file.c_str() );
+	out << pdf.rdbuf();
+      }
     }
     {
       stringstream ss;
