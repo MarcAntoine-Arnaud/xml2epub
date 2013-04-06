@@ -1,0 +1,14 @@
+Import( 'project', 'libs' )
+
+project.StaticLibrary(
+		'converter',
+		dirs      = ['src'],
+		includes  = ['src'],
+		libraries = [
+			libs.xmlpp,
+			libs.cairo,
+			libs.tidy,
+			libs.poppler_glib,
+		],
+		shared = True
+	)

@@ -1,0 +1,13 @@
+Import( 'project', 'libs' )
+
+xml2epub = project.Program(
+	target='xml2epub',
+	dirs=['Xml2EPub'],
+	includes=['Xml2EPub'],
+	libraries = [
+		libs.boost_program_options,
+		libs.common,
+		libs.converter,
+	]
+)
+
