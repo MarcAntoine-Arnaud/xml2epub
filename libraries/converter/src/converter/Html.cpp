@@ -20,15 +20,15 @@ using namespace std;
 namespace xml2epub {
 
 class html_math_state
-	: public html_state
+	: public HtmlState
 {
 
 private:
 	stringstream m_ss;
 
 public:
-	html_math_state( html_builder & root, html_state & parent, xmlpp::Element & xml_node )
-		: html_state( root, parent, xml_node )
+	html_math_state( HtmlBuilder & root, HtmlState & parent, xmlpp::Element & xml_node )
+		: HtmlState( root, parent, xml_node )
 	{
 		m_ss << "$";
 	}
@@ -37,22 +37,22 @@ public:
 	{
 	}
 
-	output_state * bold()
+	OutputState * bold()
 	{
 		throw runtime_error( "can't use bold xml tag in latex math" );
 	}
 
-	output_state * math()
+	OutputState * math()
 	{
 		throw runtime_error( "can't use math xml tag in latex math" );
 	}
 
-	output_state * section( const std::string & section_name, unsigned int level )
+	OutputState * section( const std::string & section_name, unsigned int level )
 	{
 		throw runtime_error( "can't use section xml tag in latex math" );
 	}
 
-	output_state * plot()
+	OutputState * plot()
 	{
 		throw runtime_error( "can't use plot xml tag in latex math" );
 	}
@@ -93,34 +93,34 @@ public:
 };
 
 class html_plot_state
-	: public html_state
+	: public HtmlState
 {
 private:
 	stringstream m_data;
 public:
-	html_plot_state( html_builder & root, html_state & parent, xmlpp::Element & xml_node )
-		: html_state( root, parent, xml_node ) {
+	html_plot_state( HtmlBuilder & root, HtmlState & parent, xmlpp::Element & xml_node )
+		: HtmlState( root, parent, xml_node ) {
 	}
 
 	virtual ~html_plot_state() {
 	}
 
-	output_state * bold()
+	OutputState * bold()
 	{
 		throw runtime_error( "can't use bold xml tag in plot" );
 	}
 
-	output_state * math()
+	OutputState * math()
 	{
 		throw runtime_error( "can't use math xml tag in plot" );
 	}
 
-	output_state * section( const std::string & section_name, unsigned int level )
+	OutputState * section( const std::string & section_name, unsigned int level )
 	{
 		throw runtime_error( "can't use section xml tag in plot" );
 	}
 
-	output_state * plot()
+	OutputState * plot()
 	{
 		throw runtime_error( "can't use plot xml tag in plot" );
 	}
@@ -153,21 +153,21 @@ public:
 	}
 };
 
-html_state::html_state( html_builder & root, html_state & parent, Element & xml_node )
+HtmlState::HtmlState( HtmlBuilder & root, HtmlState & parent, Element & xml_node )
 	: m_root( root )
 	, m_parent( parent )
 	, m_xml_node( xml_node )
 {
 }
 
-html_state::html_state( html_builder & root, Element & xml_node )
+HtmlState::HtmlState( HtmlBuilder & root, Element & xml_node )
 	: m_root( root )
 	, m_parent( * this )
 	, m_xml_node( xml_node )
 {
 }
 
-html_state::~html_state()
+HtmlState::~HtmlState()
 {
 	if ( &m_parent == this )
 	{
@@ -176,7 +176,7 @@ html_state::~html_state()
 	}
 	else
 	{
-		vector<html_state*>::iterator it;
+		vector<HtmlState*>::iterator it;
 		if ( ( it = find( m_parent.m_children.begin(), m_parent.m_children.end(), this ) )
 			 != m_parent.m_children.end() )
 		{
@@ -187,9 +187,9 @@ html_state::~html_state()
 	if ( m_children.begin() != m_children.end() )
 	{
 		cerr << "Warning: there are still children that have not been deleted" << endl;
-		vector<html_state*> copy( m_children );
+		vector<HtmlState*> copy( m_children );
 		m_children.clear();
-		for ( vector<html_state*>::iterator it = copy.begin(); it != copy.end(); ++it )
+		for ( vector<HtmlState*>::iterator it = copy.begin(); it != copy.end(); ++it )
 		{
 			if ( *it != NULL )
 			{
@@ -199,12 +199,12 @@ html_state::~html_state()
 	}
 }
 
-void html_state::put_text( const string & str )
+void HtmlState::put_text( const string & str )
 {
 	m_xml_node.add_child_text( str );
 }
 
-output_state * html_state::section( const std::string & section_name, unsigned int level )
+OutputState * HtmlState::section( const std::string & section_name, unsigned int level )
 {
 	string html_section_element_name;
 	{
@@ -228,38 +228,38 @@ output_state * html_state::section( const std::string & section_name, unsigned i
 		ss << "sec:" << section_name;
 		new_node->set_attribute( string("id"), ss.str() );
 	}
-	html_state * retval = new html_state( m_root, * this, * new_node );
+	HtmlState * retval = new HtmlState( m_root, * this, * new_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * html_state::bold()
+OutputState * HtmlState::bold()
 {
 	Element * new_node = m_xml_node.add_child( "b" );
 	if ( new_node == NULL )
 	{
 		throw runtime_error( "add_child() failed" );
 	}
-	html_state * retval = new html_state( m_root, * this, * new_node );
+	HtmlState * retval = new HtmlState( m_root, * this, * new_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * html_state::math()
+OutputState * HtmlState::math()
 {
-	html_state * retval = new html_math_state( m_root, * this, m_xml_node );
+	HtmlState * retval = new html_math_state( m_root, * this, m_xml_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * html_state::plot()
+OutputState * HtmlState::plot()
 {
-	html_state * retval = new html_plot_state( m_root, * this, m_xml_node );
+	HtmlState * retval = new html_plot_state( m_root, * this, m_xml_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-void html_state::finish()
+void HtmlState::finish()
 {
 	if ( &m_parent == this )
 	{
@@ -307,7 +307,7 @@ void html_state::finish()
 	}
 }
 
-html_builder::html_builder( ostream & output_stream )
+HtmlBuilder::HtmlBuilder( ostream & output_stream )
 	: out_root( out_doc.create_root_node( "html" ) )
 	, m_out( output_stream )
 	, m_root( NULL )
@@ -318,7 +318,7 @@ html_builder::html_builder( ostream & output_stream )
 	}
 }
 
-html_builder::~html_builder()
+HtmlBuilder::~HtmlBuilder()
 {
 	if ( m_root != NULL )
 	{
@@ -326,13 +326,13 @@ html_builder::~html_builder()
 	}
 }
 
-output_state * html_builder::create_root()
+OutputState * HtmlBuilder::create_root()
 {
 	if ( m_root != NULL )
 	{
 		delete m_root;
 	}
-	m_root = new html_state( *this, * out_root );
+	m_root = new HtmlState( *this, * out_root );
 	return m_root;
 }
 

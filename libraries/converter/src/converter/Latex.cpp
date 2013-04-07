@@ -17,20 +17,20 @@ using namespace std;
 namespace xml2epub
 {
 
-class encaps_state : public latex_state
+class encaps_state : public LatexState
 {
 public:
-	encaps_state( const string & encaps, latex_builder & root, latex_state & parent, ostream & outs );
+	encaps_state( const string & encaps, LatexBuilder & root, LatexState & parent, ostream & outs );
 	virtual ~encaps_state();
 public:
 	void finish();
 };
 
-class math_state : public latex_state
+class math_state : public LatexState
 {
 public:
-	math_state( latex_builder & root, latex_state & parent, ostream & outs )
-		: latex_state( root, parent, outs )
+	math_state( LatexBuilder & root, LatexState & parent, ostream & outs )
+		: LatexState( root, parent, outs )
 	{
 		m_out << "$";
 	}
@@ -38,21 +38,21 @@ public:
 	{
 	}
 
-	output_state * bold()
+	OutputState * bold()
 	{
 		throw runtime_error( "can't use bold xml tag in latex math" );
 	}
-	output_state * math()
+	OutputState * math()
 	{
 		throw runtime_error( "can't use math xml tag in latex math" );
 	}
 
-	output_state * section( const std::string & section_name, unsigned int level )
+	OutputState * section( const std::string & section_name, unsigned int level )
 	{
 		throw runtime_error( "can't use section xml tag in latex math" );
 	}
 
-	output_state * plot()
+	OutputState * plot()
 	{
 		throw runtime_error( "can't use plot xml tag in latex math" );
 	}
@@ -64,13 +64,13 @@ public:
 };
 
 
-class latex_plot_state : public latex_state
+class latex_plot_state : public LatexState
 {
 private:
 	stringstream m_data;
 public:
-	latex_plot_state( latex_builder & root, latex_state & parent, ostream & outs )
-		: latex_state( root, parent, outs )
+	latex_plot_state( LatexBuilder & root, LatexState & parent, ostream & outs )
+		: LatexState( root, parent, outs )
 	{
 	}
 
@@ -78,22 +78,22 @@ public:
 	{
 	}
 
-	output_state * bold()
+	OutputState * bold()
 	{
 		throw runtime_error( "can't use bold xml tag in plot" );
 	}
 
-	output_state * math()
+	OutputState * math()
 	{
 		throw runtime_error( "can't use math xml tag in plot" );
 	}
 
-	output_state * section( const std::string & section_name, unsigned int level )
+	OutputState * section( const std::string & section_name, unsigned int level )
 	{
 		throw runtime_error( "can't use section xml tag in plot" );
 	}
 
-	output_state * plot()
+	OutputState * plot()
 	{
 		throw runtime_error( "can't use plot xml tag in plot" );
 	}
@@ -126,14 +126,14 @@ public:
 	}
 };
 
-latex_state::latex_state( latex_builder & root, latex_state & parent, ostream & outs )
+LatexState::LatexState( LatexBuilder & root, LatexState & parent, ostream & outs )
 	: m_root( root )
 	, m_parent( parent )
 	, m_out( outs )
 {
 }
 
-latex_state::~latex_state()
+LatexState::~LatexState()
 {
 	if ( &m_parent == this )
 	{
@@ -142,7 +142,7 @@ latex_state::~latex_state()
 	}
 	else
 	{
-		vector<latex_state*>::iterator it;
+		vector<LatexState*>::iterator it;
 		if ( ( it = find( m_parent.m_children.begin(), m_parent.m_children.end(), this ) )
 			 != m_parent.m_children.end() )
 		{
@@ -153,9 +153,9 @@ latex_state::~latex_state()
 	if ( m_children.begin() != m_children.end() )
 	{
 		cerr << "Warning: there are still children that have not been deleted" << endl;
-		vector<latex_state*> copy( m_children );
+		vector<LatexState*> copy( m_children );
 		m_children.clear();
-		for ( vector<latex_state*>::iterator it = copy.begin(); it != copy.end(); ++it )
+		for ( vector<LatexState*>::iterator it = copy.begin(); it != copy.end(); ++it )
 		{
 			if ( *it != NULL )
 			{
@@ -165,12 +165,12 @@ latex_state::~latex_state()
 	}
 }
 
-void latex_state::put_text( const string & str )
+void LatexState::put_text( const string & str )
 {
 	m_out << str;
 }
 
-output_state * latex_state::section( const std::string & section_name, unsigned int level )
+OutputState * LatexState::section( const std::string & section_name, unsigned int level )
 {
 	if ( level > 2 )
 	{
@@ -182,38 +182,38 @@ output_state * latex_state::section( const std::string & section_name, unsigned 
 		m_out << "sub";
 	}
 	m_out << "section{" << section_name << "}" << endl;
-	latex_state * retval = new latex_state( m_root, *this, m_out );
+	LatexState * retval = new LatexState( m_root, *this, m_out );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * latex_state::bold()
+OutputState * LatexState::bold()
 {
-	latex_state * retval = new encaps_state( "bf", m_root, * this, m_out );
+	LatexState * retval = new encaps_state( "bf", m_root, * this, m_out );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * latex_state::math()
+OutputState * LatexState::math()
 {
-	latex_state * retval = new math_state( m_root, * this, m_out );
+	LatexState * retval = new math_state( m_root, * this, m_out );
 	m_children.push_back( retval );
 	return retval;
 }
 
-output_state * latex_state::plot()
+OutputState * LatexState::plot()
 {
-	latex_state * retval = new latex_plot_state( m_root, * this, m_out );
+	LatexState * retval = new latex_plot_state( m_root, * this, m_out );
 	m_children.push_back( retval );
 	return retval;
 }
 
-void latex_state::finish() {
+void LatexState::finish() {
 }
 
-encaps_state::encaps_state( const string & encaps, latex_builder & root,
-							latex_state & parent, std::ostream & outs )
-	: latex_state( root, parent, outs )
+encaps_state::encaps_state( const string & encaps, LatexBuilder & root,
+							LatexState & parent, std::ostream & outs )
+	: LatexState( root, parent, outs )
 {
 	m_out << "{\\" << encaps << " ";
 }
@@ -226,11 +226,11 @@ void encaps_state::finish()
 }
 
 class root_state
-	: public latex_state
+	: public LatexState
 {
 public:
-	root_state( latex_builder & root, std::ostream & outs, bool minimal ) :
-		latex_state( root, *this, outs )
+	root_state( LatexBuilder & root, std::ostream & outs, bool minimal ) :
+		LatexState( root, *this, outs )
 	{
 		if ( minimal == true )
 		{
@@ -262,12 +262,12 @@ public:
 };
 
 
-latex_builder::latex_builder( ostream & output_stream, bool minimal )
+LatexBuilder::LatexBuilder( ostream & output_stream, bool minimal )
 	: m_out( output_stream ), m_root( NULL ), m_minimal( minimal )
 {
 }
 
-latex_builder::~latex_builder()
+LatexBuilder::~LatexBuilder()
 {
 	if ( m_root != NULL )
 	{
@@ -275,7 +275,7 @@ latex_builder::~latex_builder()
 	}
 }
 
-output_state * latex_builder::create_root()
+OutputState * LatexBuilder::create_root()
 {
 	if ( m_root != NULL )
 	{
