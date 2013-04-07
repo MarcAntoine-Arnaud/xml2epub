@@ -5,6 +5,15 @@ latex-inspired-xml-markup-language to epub,azw,azw2,html,pdf converter
 
 This code is still heavily in development. If you want to give it a spin then checkout the development branch.
 
+BUILD - DRONE.IO
+================
+  
+[![Build Status](https://drone.io/github.com/MarcAntoine-Arnaud/xml2epub/status.png)](https://drone.io/github.com/MarcAntoine-Arnaud/xml2epub/latest)  
+  
+Download the latest build build under Drone.io CI:  
+[https://drone.io/github.com/MarcAntoine-Arnaud/xml2epub/files](https://drone.io/github.com/MarcAntoine-Arnaud/xml2epub/files)  
+  
+  
 BUILD INSTRUCTIONS
 ===================
 checkout development branch
