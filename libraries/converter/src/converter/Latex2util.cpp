@@ -1,7 +1,4 @@
-#include <cstdlib>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
+#include "Latex2util.hpp"
 
 #include <glib.h>
 
@@ -12,7 +9,10 @@
 #include <cairo.h>
 #include <cairo-svg.h>
 
-#include "latex2util.hpp"
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
 
 using namespace std;
 

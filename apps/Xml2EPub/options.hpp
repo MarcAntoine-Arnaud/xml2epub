@@ -1,11 +1,9 @@
 #include "common/global.hpp"
 
-#include <converter/builder.hpp>
-#include <converter/html.hpp>
-#include <converter/latex.hpp>
+#include <converter/HtmlBuilder.hpp>
+#include <converter/LatexBuilder.hpp>
 
 #include <libxml++/libxml++.h>
-
 
 #include <string>
 #include <stdexcept>
@@ -48,15 +46,19 @@ void parse_node( const Node& in_node, OutputState& state )
 			} else if ( ( name == "section" ) || ( name == "subsection" ) || ( name == "subsubsection" ) )
 			{
 				string section_name = element.get_attribute_value( "name" );
-				if ( section_name.length() == 0 ) {
+				if ( section_name.length() == 0 )
+				{
 					throw runtime_error( "Sections must have a name attribute" );
 				}
 				unsigned int level;
-				if ( name == "subsection" ) {
+				if ( name == "subsection" )
+				{
 					level = 1;
-				} else if ( name == "subsubsection" ) {
+				} else if ( name == "subsubsection" )
+				{
 					level = 2;
-				} else {
+				} else
+				{
 					level = 0;
 				}
 				out = state.section( section_name, level );

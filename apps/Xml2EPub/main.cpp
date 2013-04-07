@@ -5,10 +5,6 @@
 #include <tidy/buffio.h>
 #include <glib-object.h>
 
-#include <converter/builder.hpp>
-#include <converter/html.hpp>
-#include <converter/latex.hpp>
-
 #include <boost/program_options.hpp>
 
 #include <iostream>

@@ -5,6 +5,7 @@ project.StaticLibrary(
 		dirs      = ['src'],
 		includes  = ['src'],
 		libraries = [
+			libs.common,
 			libs.xmlpp,
 			libs.cairo,
 			libs.tidy,
