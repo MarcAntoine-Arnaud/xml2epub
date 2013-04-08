@@ -14,7 +14,7 @@ using namespace xmlpp;
 namespace xml2epub
 {
 
-void parse_node( const Node& in_node, OutputState& state )
+void parseNode( const Node& in_node, OutputState& state )
 {
 	if ( dynamic_cast<const ContentNode*>( &in_node ) != NULL )
 	{
@@ -74,7 +74,7 @@ void parse_node( const Node& in_node, OutputState& state )
 			{
 				if ( *iter != NULL )
 				{
-					parse_node( **iter, *out );
+					parseNode( **iter, *out );
 				}
 			}
 			out->finish();
@@ -83,38 +83,71 @@ void parse_node( const Node& in_node, OutputState& state )
 	}
 }
 
-void parse_file( bool do_html, istream& input_stream, ostream& output_stream )
+template< typename Builder >
+void parse( ostream& outputStream, const Element& rootIn )
+{
+	Builder builder( outputStream );
+
+	OutputState* s = builder.create_root();
+
+	Node::NodeList list = rootIn.get_children();
+	for( Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter )
+	{
+		if ( *iter != NULL )
+		{
+			parseNode( **iter, *s );
+		}
+	}
+	s->finish();
+	delete s;
+}
+
+
+void parseFile( bool doHtml, istream& inputStream, ostream& outputStream )
 {
 	DomParser parser;
 	parser.set_substitute_entities( true );
-	parser.parse_stream( input_stream );
+	parser.parse_stream( inputStream );
 	if ( parser )
 	{
 		/* if succesfull create output */
-		const Element * rootNode = parser.get_document()->get_root_node();
-		if ( rootNode == NULL )
+		const Element* rootNode = parser.get_document()->get_root_node();
+		if( rootNode == NULL )
 		{
 			throw runtime_error( "get_root_node() failed" );
 		}
 
+		const Element& root_in = dynamic_cast<const Element&>( *rootNode );
+		if( root_in.get_name() != "document" )
+		{
+			throw runtime_error( "root node must be document" );
+		}
+
+		if( doHtml )
+		{
+			parse< HtmlBuilder >( outputStream, root_in );
+		}
+		else
+		{
+			parse< LatexBuilder >( outputStream, root_in );
+		}
+		/*
 		OutputBuilder* b;
 		if ( do_html )
 		{
+			COMMON_COUT( "HtmlBuilder" );
 			b = new HtmlBuilder( output_stream );
 		} else
 		{
+			COMMON_COUT( "HtmlBuilder" );
 			b = new LatexBuilder( output_stream );
 		}
 
-		/* do stuff */
 		{
-			const Element & root_in = dynamic_cast<const Element &>( *rootNode );
-			if ( root_in.get_name() != "document" )
-			{
-				throw runtime_error( "root node must be document" );
-			}
+
 			OutputState * s = b->create_root();
 			Node::NodeList list = root_in.get_children();
+			COMMON_COUT( "parse node" );
 			for ( Node::NodeList::iterator iter = list.begin(); iter != list.end(); ++iter )
 			{
 				if ( *iter != NULL )
@@ -125,7 +158,7 @@ void parse_file( bool do_html, istream& input_stream, ostream& output_stream )
 			s->finish();
 			delete s;
 		}
-		delete b;
+		delete b;*/
 	}
 }
 

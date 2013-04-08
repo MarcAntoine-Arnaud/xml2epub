@@ -9,8 +9,9 @@ HtmlBuilder::HtmlBuilder( std::ostream& output_stream )
 	: out_root( out_doc.create_root_node( "html" ) )
 	, m_out( output_stream )
 	, m_root( NULL )
+	, m_htmlState( *out_root )
 {
-	if ( out_root == NULL )
+	if( out_root == NULL )
 	{
 		throw std::runtime_error( "create_root_node failed" );
 	}
@@ -30,7 +31,7 @@ OutputState * HtmlBuilder::create_root()
 	{
 		delete m_root;
 	}
-	m_root = new HtmlState( *this, * out_root );
+	m_root = new HtmlState( *out_root );
 	return m_root;
 }
 

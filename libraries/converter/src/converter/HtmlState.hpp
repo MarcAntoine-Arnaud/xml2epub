@@ -1,5 +1,4 @@
 #include "OutputState.hpp"
-#include "HtmlBuilder.hpp"
 
 #include <libxml++/libxml++.h>
 
@@ -14,9 +13,10 @@ namespace xml2epub
 
 class HtmlState : public OutputState
 {
-protected:
-	HtmlState( HtmlBuilder& root, HtmlState& parent, xmlpp::Element& xml_node );
-	HtmlState( HtmlBuilder& root, xmlpp::Element& xml_node );
+public:
+	HtmlState( xmlpp::Element& xml_node );
+	HtmlState( xmlpp::Element& xml_node, HtmlState& parent );
+
 	virtual ~HtmlState();
 
 public:
@@ -28,8 +28,6 @@ public:
 	void finish();
 
 protected:
-	friend class HtmlBuilder;
-	HtmlBuilder&            m_root;
 	HtmlState&              m_parent;
 	std::vector<HtmlState*> m_children;
 	xmlpp::Element&         m_xml_node;

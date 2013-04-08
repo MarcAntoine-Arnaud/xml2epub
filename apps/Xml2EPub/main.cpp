@@ -87,37 +87,37 @@ int main( int argc, char * argv[] )
 		output_file_is_cout = false;
 	}
 
-	istream* in_stream = &cin;
-	ostream* out_stream = &cout;
+	istream* inStream = &cin;
+	ostream* outStream = &cout;
 
-	if ( input_file_is_cin == false )
+	if( ! input_file_is_cin )
 	{
-		in_stream = new ifstream( input_file_path.c_str() );
-		if ( !(*in_stream) )
+		inStream = new ifstream( input_file_path.c_str() );
+		if ( !(*inStream) )
 		{
 			COMMON_CERR( "Unable to open file \"" << input_file_path << "\" for input!" );
 			return -1;
 		}
 	}
-	if ( output_file_is_cout == false )
+	if( ! output_file_is_cout )
 	{
-		out_stream = new ofstream( output_file_path.c_str() );
-		if ( !(*out_stream) )
+		outStream = new ofstream( output_file_path.c_str() );
+		if ( !(*outStream) )
 		{
 			COMMON_CERR( "Unable to open file \"" << output_file_path << "\" for output!" );
 			return -1;
 		}
 	}
 
-	xml2epub::parse_file( output_html, *in_stream, *out_stream );
+	xml2epub::parseFile( output_html, *inStream, *outStream );
 
-	if ( input_file_is_cin == false )
+	if( ! input_file_is_cin )
 	{
-		delete in_stream;
+		delete inStream;
 	}
-	if ( output_file_is_cout == false )
+	if( ! output_file_is_cout )
 	{
-		delete out_stream;
+		delete outStream;
 	}
 
 	return 0;

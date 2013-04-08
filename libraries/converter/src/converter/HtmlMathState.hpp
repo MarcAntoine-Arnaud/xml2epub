@@ -17,8 +17,8 @@ class HtmlMathState
 	: public HtmlState
 {
 public:
-	HtmlMathState( HtmlBuilder& root, HtmlState& parent, xmlpp::Element& xml_node )
-		: HtmlState( root, parent, xml_node )
+	HtmlMathState( HtmlState& parent, xmlpp::Element& xml_node )
+		: HtmlState( xml_node, parent )
 	{
 		m_ss << "$";
 	}

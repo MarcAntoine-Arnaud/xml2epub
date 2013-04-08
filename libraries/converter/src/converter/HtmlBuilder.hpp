@@ -1,4 +1,5 @@
 #include "OutputBuilder.hpp"
+#include "HtmlState.hpp"
 
 #include <libxml++/libxml++.h>
 
@@ -16,7 +17,12 @@ class HtmlBuilder : public OutputBuilder
 public:
 	HtmlBuilder( std::ostream& output_stream );
 	virtual ~HtmlBuilder();
-	OutputState * create_root();
+	OutputState* create_root();
+
+	HtmlState getState()
+	{
+		return m_htmlState;
+	}
 
 private:
 	friend class HtmlState;
@@ -24,6 +30,8 @@ private:
 	xmlpp::Element* out_root;
 	std::ostream&   m_out;
 	HtmlState*      m_root;
+
+	HtmlState       m_htmlState;
 };
 
 }

@@ -52,12 +52,15 @@ public:
 	void finish()
 	{
 		std::string image_file_path;
+
 		{
 			std::stringstream ss;
 			ss << "images/" << getpid() << "_" << random() << ".pdf";
 			image_file_path = ss.str();
 		}
+
 		system( "mkdir -p images" );
+
 		{
 			std::ofstream pdf_file( image_file_path.c_str() );
 			if ( !pdf_file )
@@ -66,6 +69,7 @@ public:
 			}
 			parse_plot( m_data.str(), pdf_file, false );
 		}
+
 		m_out << "\\begin{figure}" << std::endl;
 		m_out << "\\centering" << std::endl;
 		m_out << "\\includegraphics[width=0.7\\textwidth]{" << image_file_path << "}" << std::endl;

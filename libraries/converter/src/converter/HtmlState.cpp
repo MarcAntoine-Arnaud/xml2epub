@@ -21,16 +21,14 @@ using namespace std;
 
 namespace xml2epub {
 
-HtmlState::HtmlState( HtmlBuilder& root, HtmlState& parent, Element& xml_node )
-	: m_root( root )
-	, m_parent( parent )
+HtmlState::HtmlState( Element& xml_node )
+	: m_parent( *this )
 	, m_xml_node( xml_node )
 {
 }
 
-HtmlState::HtmlState( HtmlBuilder& root, Element& xml_node )
-	: m_root( root )
-	, m_parent( * this )
+HtmlState::HtmlState( Element& xml_node, HtmlState& parent )
+	: m_parent( parent )
 	, m_xml_node( xml_node )
 {
 }
@@ -40,7 +38,7 @@ HtmlState::~HtmlState()
 	if ( &m_parent == this )
 	{
 		/* i am root */
-		m_root.m_root = NULL;
+		//m_root.m_root = NULL;
 	}
 	else
 	{
@@ -72,7 +70,7 @@ void HtmlState::put_text( const string& str )
 	m_xml_node.add_child_text( str );
 }
 
-OutputState * HtmlState::section( const std::string& section_name, unsigned int level )
+OutputState* HtmlState::section( const std::string& section_name, unsigned int level )
 {
 	string html_section_element_name;
 	{
@@ -96,33 +94,33 @@ OutputState * HtmlState::section( const std::string& section_name, unsigned int 
 		ss << "sec:" << section_name;
 		new_node->set_attribute( string("id"), ss.str() );
 	}
-	HtmlState * retval = new HtmlState( m_root, * this, * new_node );
+	HtmlState* retval;// = new HtmlState( m_root, * this, * new_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-OutputState * HtmlState::bold()
+OutputState* HtmlState::bold()
 {
 	Element * new_node = m_xml_node.add_child( "b" );
 	if ( new_node == NULL )
 	{
 		throw runtime_error( "add_child() failed" );
 	}
-	HtmlState * retval = new HtmlState( m_root, * this, * new_node );
+	HtmlState* retval;// = new HtmlState( m_root, *this, *new_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-OutputState * HtmlState::math()
+OutputState* HtmlState::math()
 {
-	HtmlState * retval = new HtmlMathState( m_root, * this, m_xml_node );
+	HtmlState * retval;// = new HtmlMathState( m_root, *this, m_xml_node );
 	m_children.push_back( retval );
 	return retval;
 }
 
-OutputState * HtmlState::plot()
+OutputState* HtmlState::plot()
 {
-	HtmlState * retval = new HtmlPlotState( m_root, * this, m_xml_node );
+	HtmlState* retval;// = new HtmlPlotState( m_root, *this, m_xml_node );
 	m_children.push_back( retval );
 	return retval;
 }
@@ -132,7 +130,7 @@ void HtmlState::finish()
 	if ( &m_parent == this )
 	{
 		string data;
-		data = m_root.out_doc.write_to_string(  );
+		//data = m_root.out_doc.write_to_string(  );
 #if 1
 		TidyDoc tdoc = tidyCreate();
 		if ( tidyOptSetBool( tdoc, TidyXhtmlOut, yes ) == false ) {
@@ -168,9 +166,10 @@ void HtmlState::finish()
 		tidyBufFree( &output_buffer );
 		tidyBufFree( &errbuf );
 		tidyRelease( tdoc );
-		m_root.m_out << out_buffer;
+
+		//m_root.m_out << out_buffer;
 #else
-		m_root.m_out << data;
+		//m_root.m_out << data;
 #endif
 	}
 }

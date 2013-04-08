@@ -12,8 +12,8 @@ class HtmlPlotState
 	: public HtmlState
 {
 public:
-	HtmlPlotState( HtmlBuilder& root, HtmlState& parent, xmlpp::Element& xml_node )
-		: HtmlState( root, parent, xml_node )
+	HtmlPlotState( HtmlState& parent, xmlpp::Element& xml_node )
+		: HtmlState( xml_node, parent )
 	{
 	}
 
